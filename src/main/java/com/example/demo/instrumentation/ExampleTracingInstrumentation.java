@@ -10,15 +10,15 @@ import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Component
 public class ExampleTracingInstrumentation extends SimpleInstrumentation {
-    private final static Logger LOGGER = LoggerFactory.getLogger(ExampleTracingInstrumentation.class);
+
     @Override
     public InstrumentationState createState() {
         return new TracingState();
@@ -44,11 +44,11 @@ public class ExampleTracingInstrumentation extends SimpleInstrumentation {
             if(result instanceof CompletableFuture) {
                 ((CompletableFuture<?>) result).whenComplete((r, ex) -> {
                     long totalTime = System.currentTimeMillis() - startTime;
-                    LOGGER.info("Async datafetcher {} took {}ms", findDatafetcherTag(parameters), totalTime);
+                    log.info("Async datafetcher {} took {}ms", findDatafetcherTag(parameters), totalTime);
                 });
             } else {
                 long totalTime = System.currentTimeMillis() - startTime;
-                LOGGER.info("Datafetcher {} took {}ms", findDatafetcherTag(parameters), totalTime);
+                log.info("Datafetcher {} took {}ms", findDatafetcherTag(parameters), totalTime);
             }
 
             return result;
@@ -59,7 +59,7 @@ public class ExampleTracingInstrumentation extends SimpleInstrumentation {
     public CompletableFuture<ExecutionResult> instrumentExecutionResult(ExecutionResult executionResult, InstrumentationExecutionParameters parameters) {
         TracingState tracingState = parameters.getInstrumentationState();
         long totalTime = System.currentTimeMillis() - tracingState.startTime;
-        LOGGER.info("Total execution time: {}ms", totalTime);
+        log.info("Total execution time: {}ms", totalTime);
 
         return super.instrumentExecutionResult(executionResult, parameters);
     }

@@ -5,17 +5,17 @@ import com.example.demo.services.ShowsService;
 import com.netflix.graphql.dgs.DgsComponent;
 import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @DgsComponent
 public class ShowsDatafetcher {
+
     private final ShowsService showsService;
 
-    public ShowsDatafetcher(ShowsService showsService) {
-        this.showsService = showsService;
-    }
 
     /**
      * This datafetcher resolves the shows field on Query.

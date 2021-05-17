@@ -3,6 +3,7 @@ package com.example.demo.dataloaders;
 import com.example.demo.generated.types.Review;
 import com.example.demo.services.DefaultReviewsService;
 import com.netflix.graphql.dgs.DgsDataLoader;
+import lombok.RequiredArgsConstructor;
 import org.dataloader.BatchLoaderEnvironment;
 import org.dataloader.MappedBatchLoader;
 import org.dataloader.MappedBatchLoaderWithContext;
@@ -15,14 +16,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+@RequiredArgsConstructor
 @DgsDataLoader(name = "reviewsWithContext")
 public class ReviewsDataLoaderWithContext implements MappedBatchLoaderWithContext<Integer, List<Review>> {
-    private final DefaultReviewsService reviewsService;
 
-    @Autowired
-    public ReviewsDataLoaderWithContext(DefaultReviewsService reviewsService) {
-        this.reviewsService = reviewsService;
-    }
+    private final DefaultReviewsService reviewsService;
 
     @Override
     public CompletionStage<Map<Integer, List<Review>>> load(Set<Integer> keys, BatchLoaderEnvironment environment) {

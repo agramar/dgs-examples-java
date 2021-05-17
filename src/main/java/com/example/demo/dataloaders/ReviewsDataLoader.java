@@ -3,6 +3,7 @@ package com.example.demo.dataloaders;
 import com.example.demo.generated.types.Review;
 import com.example.demo.services.DefaultReviewsService;
 import com.netflix.graphql.dgs.DgsDataLoader;
+import lombok.RequiredArgsConstructor;
 import org.dataloader.MappedBatchLoader;
 
 import java.util.ArrayList;
@@ -12,13 +13,11 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+@RequiredArgsConstructor
 @DgsDataLoader(name = "reviews")
 public class ReviewsDataLoader implements MappedBatchLoader<Integer, List<Review>> {
-    private final DefaultReviewsService reviewsService;
 
-    public ReviewsDataLoader(DefaultReviewsService reviewsService) {
-        this.reviewsService = reviewsService;
-    }
+    private final DefaultReviewsService reviewsService;
 
     /**
      * This method will be called once, even if multiple datafetchers use the load() method on the DataLoader.

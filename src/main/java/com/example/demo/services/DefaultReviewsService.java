@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.generated.types.Review;
 import com.example.demo.generated.types.SubmittedReview;
 import com.github.javafaker.Faker;
+import lombok.RequiredArgsConstructor;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,7 @@ import java.util.stream.IntStream;
  * For convenience in the demo we just generate Reviews in memory, but imagine this would be backed by for example a database.
  * If this was indeed backed by a database, it would be very important to avoid the N+1 problem, which means we need to use a DataLoader to call this class.
  */
+@RequiredArgsConstructor
 @Service
 public class DefaultReviewsService implements ReviewsService {
     private final static Logger logger = LoggerFactory.getLogger(DefaultReviewsService.class);
@@ -37,10 +39,6 @@ public class DefaultReviewsService implements ReviewsService {
     private final Map<Integer, List<Review>> reviews = new ConcurrentHashMap<>();
     private FluxSink<Review> reviewsStream;
     private ConnectableFlux<Review> reviewsPublisher;
-
-    public DefaultReviewsService(ShowsService showsService) {
-        this.showsService = showsService;
-    }
 
     @PostConstruct
     private void createReviews() {
@@ -57,9 +55,7 @@ public class DefaultReviewsService implements ReviewsService {
         });
 
 
-        Flux<Review> publisher = Flux.create(emitter -> {
-            reviewsStream = emitter;
-        });
+        Flux<Review> publisher = Flux.create(emitter -> reviewsStream = emitter);
 
         reviewsPublisher = publisher.publish();
         reviewsPublisher.connect();
@@ -99,18 +95,9 @@ public class DefaultReviewsService implements ReviewsService {
     }
 
     public void saveReviews(List<SubmittedReview> reviewsInput) {
-        reviewsInput.forEach(reviewInput -> {
-            List<Review> reviewsForShow = reviews.computeIfAbsent(reviewInput.getShowId(), (key) -> new ArrayList<>());
-            Review review = Review.newBuilder()
-                    .username(reviewInput.getUsername())
-                    .starScore(reviewInput.getStarScore())
-                    .submittedDate(OffsetDateTime.now()).build();
-
-            reviewsForShow.add(review);
-            reviewsStream.next(review);
-
-            logger.info("Review added {}", review);
-        });
+        for (SubmittedReview submittedReview : reviewsInput) {
+            saveReview(submittedReview);
+        }
     }
 
     public Publisher<Review> getReviewsPublisher() {

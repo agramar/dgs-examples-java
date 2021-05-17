@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 @DgsComponent
 public class ArtworkUploadDataFetcher {
+
     @DgsMutation
     public List<Image> addArtwork(@InputArgument Integer showId, @InputArgument MultipartFile upload) throws IOException {
         Path uploadDir = Paths.get("uploaded-images");
